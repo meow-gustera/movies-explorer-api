@@ -8,6 +8,8 @@ const allowedCors = [
   'http://192.168.2.200:3000',
   'https://192.168.2.200:3001',
   'https://192.168.2.200:3000',
+  'http://158.160.4.11',
+  'https://158.160.4.11',
   'https://api.paltus-movies.nomoredomains.rocks',
   'http://api.paltus-movies.nomoredomains.rocks',
 ];
