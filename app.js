@@ -5,7 +5,6 @@ const { errors } = require('celebrate');
 
 const cookieParser = require('cookie-parser');
 const helmet = require('helmet');
-const bodyParser = require('body-parser');
 const handleError = require('./middlewares/handleError');
 const appRouters = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -24,8 +23,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/bitfilmsdb')
   .then(() => console.log('Подключилось к БД'))
   .catch((err) => console.log(`Ошибка: ${err.message}`));
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(cookieParser());
 
 app.use(appRouters);

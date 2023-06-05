@@ -3,11 +3,9 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const ErrorStatusBadRequest = require('../utilits/errorStatusBadRequest');
 const ErrorStatusNotFound = require('../utilits/errorStatusNotFound');
-const ErrorStatusConflict = require('../utilits/errorStatusConflict');
 
 module.exports.login = (req, res, next) => {
   const { NODE_ENV, JWT_SECRET } = process.env;
-
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -16,8 +14,7 @@ module.exports.login = (req, res, next) => {
       res.cookie('jwt', token, {
         httpOnly: true,
       })
-        .send({ message: 'Вы авторизовались' })
-        .end();
+        .send({ message: 'Вы авторизовались' });
     })
     .catch(next);
 };
@@ -33,15 +30,13 @@ module.exports.createUser = (req, res, next) => {
       email: req.body.email,
       password: hash,
     }))
-    .then((user) => res.send({
+    .then((user) => res.status(201).send({
       name: user.name,
       email: user.email,
     }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ErrorStatusBadRequest('Переданы некорректные данные при создании юзера.'));
-      } else if (err.code === 11000) {
-        next(new ErrorStatusConflict('Такой email уже используется'));
       } else {
         next(err);
       }
@@ -49,7 +44,6 @@ module.exports.createUser = (req, res, next) => {
 };
 
 module.exports.getUserMe = (req, res, next) => {
-  console.log(req.user._id);
   User.findById(req.user._id)
     .then((user) => {
       if
@@ -59,15 +53,7 @@ module.exports.getUserMe = (req, res, next) => {
         res.send(user);
       }
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new ErrorStatusBadRequest('Переданы некорректные данные при создании юзера.'));
-      } else if (err.code === 11000) {
-        next(new ErrorStatusConflict('Такой email уже используется'));
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
 module.exports.changeProfile = (req, res, next) => {

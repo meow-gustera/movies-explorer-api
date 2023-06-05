@@ -5,7 +5,7 @@ const ErrorStatusForbidden = require('../utilits/errorStatusForbidden');
 
 // get
 module.exports.getMovies = (req, res, next) => {
-  Movie.find({})
+  Movie.find({ owner: req.user._id })
     .then((movies) => res.send(movies))
     .catch(next);
 };
@@ -60,7 +60,7 @@ module.exports.deleteMovie = (req, res, next) => {
       if (movie === null) {
         throw new ErrorStatusNotFound('Фильм по указанному _id не найден.');
       } else if (movie.owner._id.toString() === req.user._id) {
-        return Movie.findByIdAndRemove(movieId)
+        return movie.deleteOne()
           .then(() => res.send({ message: `Удалена карточка: ${movie}` }));
       } else {
         throw new ErrorStatusForbidden('Удалить фильм может только её владелец.');
