@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const ErrorStatusBadRequest = require('../utilits/errorStatusBadRequest');
 const ErrorStatusNotFound = require('../utilits/errorStatusNotFound');
+const ErrorStatusConflict = require('../utilits/errorStatusConflict');
 
 module.exports.login = (req, res, next) => {
   const { NODE_ENV, JWT_SECRET } = process.env;
@@ -37,6 +38,8 @@ module.exports.createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ErrorStatusBadRequest('Переданы некорректные данные при создании юзера.'));
+      } else if (err.code === 11000) {
+        next(new ErrorStatusConflict('Такой email уже используется'));
       } else {
         next(err);
       }
@@ -70,5 +73,13 @@ module.exports.changeProfile = (req, res, next) => {
     .then((user) => {
       res.send(user);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new ErrorStatusBadRequest('Переданы некорректные данные при создании юзера.'));
+      } else if (err.code === 11000) {
+        next(new ErrorStatusConflict('Такой email уже используется'));
+      } else {
+        next(err);
+      }
+    });
 };
