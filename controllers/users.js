@@ -14,7 +14,7 @@ module.exports.login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret', { expiresIn: '7d' });
       res.cookie('jwt', token, {
         httpOnly: true,
-        sameSite: false,
+        secure: NODE_ENV === 'production',
       })
         .send({ message: 'Вы авторизовались' });
     })
@@ -22,7 +22,7 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.signoutUser = (req, res) => {
-  res.clearCookie('jwt').send('Кука удалена');
+  res.clearCookie('jwt').send({ message: 'Кука удалена' });
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -37,10 +37,11 @@ module.exports.createUser = (req, res, next) => {
       email: user.email,
     }))
     .catch((err) => {
+      console.log(err);
       if (err.name === 'ValidationError') {
-        next(new ErrorStatusBadRequest('Переданы некорректные данные при создании юзера.'));
+        next(new ErrorStatusBadRequest('При регистрации пользователя произошла ошибка.'));
       } else if (err.code === 11000) {
-        next(new ErrorStatusConflict('Такой email уже используется'));
+        next(new ErrorStatusConflict('Пользователь с таким email уже существует.'));
       } else {
         next(err);
       }
@@ -50,8 +51,7 @@ module.exports.createUser = (req, res, next) => {
 module.exports.getUserMe = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
-      if
-      (user === null) {
+      if (user === null) {
         throw new ErrorStatusNotFound('Необходима авторизация');
       } else {
         res.send(user);
@@ -76,9 +76,9 @@ module.exports.changeProfile = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new ErrorStatusBadRequest('Переданы некорректные данные при создании юзера.'));
+        next(new ErrorStatusBadRequest('При обновлении профиля произошла ошибка.'));
       } else if (err.code === 11000) {
-        next(new ErrorStatusConflict('Такой email уже используется'));
+        next(new ErrorStatusConflict('Пользователь с таким email уже существует.'));
       } else {
         next(err);
       }

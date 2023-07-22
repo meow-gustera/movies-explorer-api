@@ -20,7 +20,7 @@ router.use('/movies', moviesRouter);
 router.post('/signout', signoutUser);
 
 router.use('*', (req, res, next) => {
-  next(new ErrorStatusNotFound('Страница не найдена'));
+  next(new ErrorStatusNotFound('Страница по указанному маршруту не найдена.'));
 });
 
 module.exports = router;
