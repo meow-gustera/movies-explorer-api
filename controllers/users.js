@@ -15,6 +15,7 @@ module.exports.login = (req, res, next) => {
       res.cookie('jwt', token, {
         httpOnly: true,
         secure: NODE_ENV === 'production',
+        sameSite: 'none',
       })
         .send({ message: 'Вы авторизовались' });
     })
@@ -22,7 +23,14 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.signoutUser = (req, res) => {
-  res.clearCookie('jwt').send({ message: 'Кука удалена' });
+  const { NODE_ENV } = process.env;
+
+  res.clearCookie('jwt', {
+    httpOnly: true,
+    secure: NODE_ENV === 'production',
+    sameSite: 'none',
+  })
+    .send({ message: 'Кука удалена' });
 };
 
 module.exports.createUser = (req, res, next) => {
