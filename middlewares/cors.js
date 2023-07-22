@@ -13,6 +13,8 @@ const allowedCors = [
   'https://158.160.4.11',
   'https://api.paltus-movies.nomoredomains.rocks',
   'http://api.paltus-movies.nomoredomains.rocks',
+  'https://paltus-movies.nomoredomains.xyz',
+  'http://paltus-movies.nomoredomains.xyz',
 ];
 
 module.exports = (req, res, next) => {
